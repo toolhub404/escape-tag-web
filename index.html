@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>1vs1 脱出鬼ごっこ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #111827;
+      color: white;
+      text-align: center;
+    }
+
+    #menu {
+      padding: 20px;
+    }
+
+    input, button, select {
+      width: 90%;
+      max-width: 360px;
+      padding: 12px;
+      margin: 8px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: none;
+    }
+
+    button {
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+    }
+
+    canvas {
+      background: #1f2937;
+      display: block;
+      margin: 0 auto;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="menu">
+    <h1>脱出鬼ごっこ</h1>
+
+    <input id="roomId" placeholder="部屋コード 例：ABC12">
+    <select id="role">
+      <option value="runner">逃走者</option>
+      <option value="killer">鬼</option>
+    </select>
+
+    <button id="joinButton">部屋に入る</button>
+  </div>
+
+  <canvas id="game" width="360" height="520"></canvas>
+
+  <script type="module" src="./game.js?v=1"></script>
+</body>
+</html>
