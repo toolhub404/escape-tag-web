@@ -42,6 +42,57 @@ const actionButton = document.getElementById("actionButton");
 const resultOverlay = document.getElementById("resultOverlay");
 const resultTitle = document.getElementById("resultTitle");
 const resultMessage = document.getElementById("resultMessage");
+
+function isGameActive() {
+  return connected && !gameScreen.classList.contains("hidden");
+}
+
+function setPlayingUi(active) {
+  if (active) {
+    document.body.classList.add("playing");
+  } else {
+    document.body.classList.remove("playing");
+  }
+}
+
+// ピンチズーム / スクロール / ダブルタップズーム抑制
+let lastTouchEndTime = 0;
+
+document.addEventListener("gesturestart", event => {
+  if (isGameActive()) event.preventDefault();
+}, { passive: false });
+
+document.addEventListener("gesturechange", event => {
+  if (isGameActive()) event.preventDefault();
+}, { passive: false });
+
+document.addEventListener("gestureend", event => {
+  if (isGameActive()) event.preventDefault();
+}, { passive: false });
+
+document.addEventListener("touchmove", event => {
+  if (!isGameActive()) return;
+
+  const target = event.target;
+  if (target && target.closest && target.closest(".game-screen")) {
+    event.preventDefault();
+  }
+}, { passive: false });
+
+document.addEventListener("touchend", event => {
+  if (!isGameActive()) return;
+
+  const now = Date.now();
+  if (now - lastTouchEndTime < 300) {
+    event.preventDefault();
+  }
+  lastTouchEndTime = now;
+}, { passive: false });
+
+window.addEventListener("wheel", event => {
+  if (isGameActive()) event.preventDefault();
+}, { passive: false });
+
 const restartButton = document.getElementById("restartButton");
 const backMenuButton = document.getElementById("backMenuButton");
 
@@ -153,6 +204,7 @@ joinButton.onclick = async () => {
   });
 
   connected = true;
+  setPlayingUi(true);
   menu.classList.add("hidden");
   gameScreen.classList.remove("hidden");
   roomLabel.textContent = `ROOM ${roomId}`;
@@ -187,6 +239,7 @@ async function leaveRoom() {
 
   resultOverlay.classList.add("hidden");
   gameScreen.classList.add("hidden");
+  setPlayingUi(false);
   menu.classList.remove("hidden");
 }
 
@@ -254,9 +307,47 @@ function updateJoystick(e) {
   stick.style.top = `${base + dy}px`;
 }
 
-actionButton.addEventListener("pointerdown", () => actionPressed = true);
-actionButton.addEventListener("pointerup", () => actionPressed = false);
-actionButton.addEventListener("pointercancel", () => actionPressed = false);
+// ACTION長押し時にiPhoneのコピー/選択メニューが出ないようにする
+document.addEventListener("contextmenu", event => {
+  event.preventDefault();
+});
+
+document.addEventListener("selectstart", event => {
+  const target = event.target;
+  if (target && target.closest && target.closest(".game-screen")) {
+    event.preventDefault();
+  }
+});
+
+actionButton.addEventListener("pointerdown", event => {
+  event.preventDefault();
+  actionPressed = true;
+  try {
+    actionButton.setPointerCapture(event.pointerId);
+  } catch (e) {}
+});
+
+actionButton.addEventListener("pointerup", event => {
+  event.preventDefault();
+  actionPressed = false;
+});
+
+actionButton.addEventListener("pointercancel", event => {
+  event.preventDefault();
+  actionPressed = false;
+});
+
+actionButton.addEventListener("pointerleave", () => {
+  actionPressed = false;
+});
+
+actionButton.addEventListener("touchstart", event => {
+  event.preventDefault();
+}, { passive: false });
+
+actionButton.addEventListener("touchend", event => {
+  event.preventDefault();
+}, { passive: false });
 
 function updateLocal(dt) {
   if (!connected || roomState.winner) return;
