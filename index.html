@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Escape Tag</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="./style.css?v=2">
+  <link rel="stylesheet" href="./style.css?v=3">
 </head>
 <body>
   <div id="menu" class="screen">
@@ -27,7 +27,7 @@
       <button id="joinButton">部屋に入る</button>
 
       <div class="note">
-        <p>同じ部屋コードで、片方は逃走者、もう片方は鬼で入ってください。</p>
+        <p>横画面推奨です。</p>
         <p>逃走者：発電機2台修理 → ゲート脱出で勝利</p>
         <p>鬼：逃走者を2回捕獲で勝利</p>
       </div>
@@ -40,14 +40,16 @@
         <div id="roomLabel" class="room-label">ROOM</div>
         <div id="roleLabel" class="role-label">ROLE</div>
       </div>
-      <button id="leaveButton" class="small danger">退出</button>
+      <div class="top-actions">
+        <button id="leaveButton" class="small danger">退出</button>
+      </div>
     </div>
 
-    <canvas id="game" width="360" height="560"></canvas>
+    <canvas id="game" width="720" height="405"></canvas>
 
     <div class="hud">
       <div id="statusText">待機中...</div>
-      <div id="hintText">操作：画面左下スティック / 右下アクション</div>
+      <div id="hintText">操作：左スティック / 右ACTION</div>
     </div>
 
     <div id="joystick" class="joystick">
@@ -55,6 +57,14 @@
     </div>
 
     <button id="actionButton" class="action-button">ACTION</button>
+  </div>
+
+  <div id="rotateNotice" class="rotate-notice">
+    <div class="rotate-box">
+      <div class="rotate-icon">↻</div>
+      <h2>横画面にしてください</h2>
+      <p>このゲームは横画面で遊ぶ設計です。</p>
+    </div>
   </div>
 
   <div id="resultOverlay" class="result-overlay hidden">
@@ -66,6 +76,6 @@
     </div>
   </div>
 
-  <script type="module" src="./game.js?v=2"></script>
+  <script type="module" src="./game.js?v=3"></script>
 </body>
 </html>

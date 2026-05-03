@@ -55,39 +55,42 @@ let lastSync = 0;
 let captureCooldownUntil = 0;
 let actionPressed = false;
 
-let myPlayer = { x: 80, y: 280, role: "runner", alive: true, updatedAt: 0 };
+let myPlayer = { x: 90, y: 202, role: "runner", alive: true, updatedAt: 0 };
 const input = { x: 0, y: 0 };
 
 const MAP = {
-  w: 360, h: 560,
+  w: 720,
+  h: 405,
   generatorsNeeded: 2,
   runnerLivesMax: 2,
-  captureDistance: 25,
-  repairDistance: 34,
-  gateDistance: 36,
+  captureDistance: 27,
+  repairDistance: 36,
+  gateDistance: 38,
   repairPerSecond: 30,
   syncMs: 50
 };
 
 const generators = [
-  { id: "g1", x: 72, y: 78 },
-  { id: "g2", x: 288, y: 128 },
-  { id: "g3", x: 90, y: 430 },
-  { id: "g4", x: 280, y: 460 }
+  { id: "g1", x: 95, y: 72 },
+  { id: "g2", x: 605, y: 92 },
+  { id: "g3", x: 160, y: 315 },
+  { id: "g4", x: 560, y: 318 }
 ];
 
 const gates = [
-  { id: "top", x: 180, y: 14, w: 84, h: 18 },
-  { id: "bottom", x: 180, y: 546, w: 84, h: 18 }
+  { id: "left", x: 14, y: 202, w: 20, h: 92 },
+  { id: "right", x: 706, y: 202, w: 20, h: 92 }
 ];
 
 const walls = [
-  { x: 126, y: 70, w: 108, h: 22 },
-  { x: 40, y: 170, w: 120, h: 22 },
-  { x: 220, y: 205, w: 100, h: 22 },
-  { x: 118, y: 300, w: 124, h: 22 },
-  { x: 38, y: 372, w: 74, h: 22 },
-  { x: 246, y: 376, w: 76, h: 22 }
+  { x: 155, y: 54, w: 152, h: 22 },
+  { x: 420, y: 58, w: 132, h: 22 },
+  { x: 60, y: 160, w: 148, h: 22 },
+  { x: 286, y: 142, w: 150, h: 22 },
+  { x: 520, y: 164, w: 138, h: 22 },
+  { x: 160, y: 246, w: 122, h: 22 },
+  { x: 370, y: 252, w: 158, h: 22 },
+  { x: 280, y: 338, w: 162, h: 22 }
 ];
 
 function defaultState() {
@@ -115,7 +118,7 @@ randomRoomButton.onclick = () => roomInput.value = randomRoomCode();
 joinButton.onclick = async () => {
   const code = roomInput.value.trim().toUpperCase();
   if (!code) {
-    alert("部屋コードを入力してください");
+    statusText.textContent = "部屋コードを入力してください";
     return;
   }
 
@@ -124,8 +127,8 @@ joinButton.onclick = async () => {
   playerId = role;
 
   myPlayer = {
-    x: role === "runner" ? 70 : 290,
-    y: 280,
+    x: role === "runner" ? 90 : 630,
+    y: 202,
     role,
     alive: true,
     updatedAt: 0
@@ -163,21 +166,25 @@ backMenuButton.onclick = async () => { resultOverlay.classList.add("hidden"); aw
 restartButton.onclick = async () => {
   if (!roomId) return;
   await set(ref(db, `rooms/${roomId}/state`), { ...defaultState(), updatedAt: serverTimestamp() });
-  await update(ref(db, `rooms/${roomId}/players/runner`), { x: 70, y: 280, alive: true, updatedAt: serverTimestamp() });
-  await update(ref(db, `rooms/${roomId}/players/killer`), { x: 290, y: 280, alive: true, updatedAt: serverTimestamp() });
-  if (role === "runner") { myPlayer.x = 70; myPlayer.y = 280; }
-  else { myPlayer.x = 290; myPlayer.y = 280; }
+  await update(ref(db, `rooms/${roomId}/players/runner`), { x: 90, y: 202, alive: true, updatedAt: serverTimestamp() });
+  await update(ref(db, `rooms/${roomId}/players/killer`), { x: 630, y: 202, alive: true, updatedAt: serverTimestamp() });
+
+  if (role === "runner") { myPlayer.x = 90; myPlayer.y = 202; }
+  else { myPlayer.x = 630; myPlayer.y = 202; }
+
   resultOverlay.classList.add("hidden");
 };
 
 async function leaveRoom() {
   if (roomId && playerId) await remove(ref(db, `rooms/${roomId}/players/${playerId}`));
+
   connected = false;
   roomId = "";
   role = "";
   playerId = "";
   players = {};
   roomState = defaultState();
+
   resultOverlay.classList.add("hidden");
   gameScreen.classList.add("hidden");
   menu.classList.remove("hidden");
@@ -215,26 +222,36 @@ joystick.addEventListener("pointerup", e => {
   joystickPointer = null;
   input.x = 0;
   input.y = 0;
-  stick.style.left = "34px";
-  stick.style.top = "34px";
+  resetStickPosition();
 });
+
+function resetStickPosition() {
+  const isSmallHeight = window.innerHeight <= 430;
+  stick.style.left = isSmallHeight ? "27px" : "32px";
+  stick.style.top = isSmallHeight ? "27px" : "32px";
+}
 
 function updateJoystick(e) {
   const rect = joystick.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
+
   let dx = e.clientX - cx;
   let dy = e.clientY - cy;
-  const max = 34;
+  const max = Math.min(34, rect.width * 0.31);
   const len = Math.hypot(dx, dy);
+
   if (len > max) {
     dx = dx / len * max;
     dy = dy / len * max;
   }
+
   input.x = dx / max;
   input.y = dy / max;
-  stick.style.left = `${34 + dx}px`;
-  stick.style.top = `${34 + dy}px`;
+
+  const base = (rect.width - stick.offsetWidth) / 2;
+  stick.style.left = `${base + dx}px`;
+  stick.style.top = `${base + dy}px`;
 }
 
 actionButton.addEventListener("pointerdown", () => actionPressed = true);
@@ -249,7 +266,7 @@ function updateLocal(dt) {
   const len = Math.hypot(dx, dy);
   if (len > 1) { dx /= len; dy /= len; }
 
-  const speed = role === "runner" ? 128 : 116;
+  const speed = role === "runner" ? 150 : 134;
   const oldX = myPlayer.x;
   const oldY = myPlayer.y;
 
@@ -259,8 +276,8 @@ function updateLocal(dt) {
   myPlayer.y += dy * speed * dt;
   if (collidesWithWalls(myPlayer.x, myPlayer.y)) myPlayer.y = oldY;
 
-  myPlayer.x = clamp(myPlayer.x, 14, MAP.w - 14);
-  myPlayer.y = clamp(myPlayer.y, 14, MAP.h - 14);
+  myPlayer.x = clamp(myPlayer.x, 16, MAP.w - 16);
+  myPlayer.y = clamp(myPlayer.y, 16, MAP.h - 16);
 
   if (actionPressed) handleAction(dt);
 }
@@ -270,10 +287,12 @@ function handleAction(dt) {
 
   if (role === "runner") {
     const gen = nearestGenerator();
+
     if (gen && dist(myPlayer, gen) < MAP.repairDistance && !roomState.fixed?.[gen.id]) {
       const current = roomState.progress?.[gen.id] || 0;
       const next = Math.min(100, current + MAP.repairPerSecond * dt);
       const fixedObj = { ...(roomState.fixed || {}) };
+
       if (next >= 100) fixedObj[gen.id] = true;
 
       const patch = {};
@@ -311,9 +330,10 @@ function handleAction(dt) {
           captures,
           updatedAt: serverTimestamp()
         });
+
         update(ref(db, `rooms/${roomId}/players/runner`), {
-          x: 70,
-          y: 280,
+          x: 90,
+          y: 202,
           updatedAt: serverTimestamp()
         });
       }
@@ -323,6 +343,7 @@ function handleAction(dt) {
 
 function syncPlayer() {
   if (!connected || !roomId || !playerId) return;
+
   const now = Date.now();
   if (now - lastSync < MAP.syncMs) return;
   lastSync = now;
@@ -351,11 +372,13 @@ function handleWinDisplay() {
   }
 
   resultOverlay.classList.remove("hidden");
+
   const isMe = roomState.winner === role;
   resultTitle.textContent = isMe ? "勝利！" : "敗北...";
-  resultMessage.textContent = roomState.winner === "runner"
-    ? "逃走者がゲートから脱出しました。"
-    : "鬼が逃走者を2回捕獲しました。";
+  resultMessage.textContent =
+    roomState.winner === "runner"
+      ? "逃走者がゲートから脱出しました。"
+      : "鬼が逃走者を2回捕獲しました。";
 }
 
 function draw() {
@@ -371,14 +394,15 @@ function draw() {
 function drawBackground() {
   ctx.fillStyle = "#111827";
   ctx.fillRect(0, 0, MAP.w, MAP.h);
+
   ctx.strokeStyle = "#374151";
   ctx.lineWidth = 3;
   ctx.strokeRect(8, 8, MAP.w - 16, MAP.h - 16);
 
   ctx.fillStyle = "rgba(34,197,94,0.10)";
-  ctx.fillRect(22, 116, 74, 54);
-  ctx.fillRect(260, 300, 72, 58);
-  ctx.fillRect(132, 438, 88, 56);
+  ctx.fillRect(42, 104, 118, 62);
+  ctx.fillRect(520, 232, 126, 72);
+  ctx.fillRect(270, 272, 128, 58);
 }
 
 function drawWalls() {
@@ -394,19 +418,20 @@ function drawGenerators() {
   generators.forEach(g => {
     const fixed = !!roomState.fixed?.[g.id];
     const progress = fixed ? 100 : (roomState.progress?.[g.id] || 0);
+
     ctx.fillStyle = fixed ? "#22c55e" : "#facc15";
-    roundRect(g.x - 16, g.y - 16, 32, 32, 7);
+    roundRect(g.x - 17, g.y - 17, 34, 34, 8);
     ctx.fill();
 
     ctx.fillStyle = "#111827";
-    ctx.font = "bold 13px system-ui";
+    ctx.font = "bold 14px system-ui";
     ctx.textAlign = "center";
     ctx.fillText("発", g.x, g.y + 5);
 
     ctx.fillStyle = "rgba(255,255,255,0.20)";
-    ctx.fillRect(g.x - 22, g.y + 22, 44, 6);
+    ctx.fillRect(g.x - 24, g.y + 25, 48, 6);
     ctx.fillStyle = fixed ? "#22c55e" : "#38bdf8";
-    ctx.fillRect(g.x - 22, g.y + 22, 44 * progress / 100, 6);
+    ctx.fillRect(g.x - 24, g.y + 25, 48 * progress / 100, 6);
   });
 }
 
@@ -414,41 +439,50 @@ function drawGates() {
   gates.forEach(g => {
     ctx.fillStyle = roomState.gateOpen ? "#22c55e" : "#374151";
     ctx.fillRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
+
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = "white";
     ctx.font = "11px system-ui";
     ctx.textAlign = "center";
-    ctx.fillText(roomState.gateOpen ? "EXIT" : "LOCK", g.x, g.y + 4);
+    ctx.fillText(roomState.gateOpen ? "EXIT" : "LOCK", 0, 4);
+    ctx.restore();
   });
 }
 
 function drawPlayers() {
   Object.keys(players).forEach(id => {
     const p = players[id];
+
     ctx.fillStyle = p.role === "runner" ? "#38bdf8" : "#ef4444";
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.role === "killer" ? 14 : 11, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, p.role === "killer" ? 15 : 12, 0, Math.PI * 2);
     ctx.fill();
+
     ctx.strokeStyle = "rgba(255,255,255,0.72)";
     ctx.lineWidth = 2;
     ctx.stroke();
+
     ctx.fillStyle = "white";
     ctx.font = "bold 12px system-ui";
     ctx.textAlign = "center";
-    ctx.fillText(p.role === "runner" ? "逃" : "鬼", p.x, p.y - 20);
+    ctx.fillText(p.role === "runner" ? "逃" : "鬼", p.x, p.y - 22);
   });
 }
 
 function drawHudOnCanvas() {
   const fixedCount = countFixed(roomState.fixed || {});
+
   ctx.fillStyle = "rgba(0,0,0,0.45)";
-  roundRect(14, 14, 160, 54, 12);
+  roundRect(14, 14, 172, 56, 12);
   ctx.fill();
 
   ctx.fillStyle = "white";
-  ctx.font = "bold 13px system-ui";
+  ctx.font = "bold 14px system-ui";
   ctx.textAlign = "left";
-  ctx.fillText(`発電機 ${fixedCount}/${MAP.generatorsNeeded}`, 26, 36);
-  ctx.fillText(`逃走者ライフ ${roomState.runnerLives ?? MAP.runnerLivesMax}`, 26, 58);
+  ctx.fillText(`発電機 ${fixedCount}/${MAP.generatorsNeeded}`, 26, 38);
+  ctx.fillText(`逃走者ライフ ${roomState.runnerLives ?? MAP.runnerLivesMax}`, 26, 60);
 }
 
 function updateStatusText() {
@@ -481,7 +515,7 @@ function updateStatusText() {
 }
 
 function collidesWithWalls(x, y) {
-  const r = role === "killer" ? 13 : 10;
+  const r = role === "killer" ? 14 : 11;
   return walls.some(w => circleRectCollision(x, y, r, w));
 }
 
@@ -496,27 +530,48 @@ function circleRectCollision(cx, cy, r, rect) {
 function nearestGenerator() {
   let best = null;
   let bestD = Infinity;
+
   generators.forEach(g => {
     const d = dist(myPlayer, g);
-    if (d < bestD) { bestD = d; best = g; }
+    if (d < bestD) {
+      bestD = d;
+      best = g;
+    }
   });
+
   return best;
 }
 
 function nearestGate() {
   let best = null;
   let bestD = Infinity;
+
   gates.forEach(g => {
     const d = gateDistance(g, myPlayer);
-    if (d < bestD) { bestD = d; best = g; }
+    if (d < bestD) {
+      bestD = d;
+      best = g;
+    }
   });
+
   return best;
 }
 
-function gateDistance(gate, p) { return Math.hypot(gate.x - p.x, gate.y - p.y); }
-function countFixed(fixed) { return Object.values(fixed || {}).filter(Boolean).length; }
-function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function gateDistance(gate, p) {
+  return Math.hypot(gate.x - p.x, gate.y - p.y);
+}
+
+function countFixed(fixed) {
+  return Object.values(fixed || {}).filter(Boolean).length;
+}
+
+function dist(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
 
 function roundRect(x, y, w, h, r) {
   ctx.beginPath();
@@ -533,10 +588,12 @@ let lastTime = performance.now();
 function loop(now = performance.now()) {
   const dt = Math.min(0.04, (now - lastTime) / 1000);
   lastTime = now;
+
   updateLocal(dt);
   syncPlayer();
   draw();
   updateStatusText();
+
   requestAnimationFrame(loop);
 }
 
