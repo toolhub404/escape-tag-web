@@ -162,11 +162,17 @@ button.small {
 
 .topbar {
   width: min(100%, 920px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 8px;
   z-index: 5;
+}
+
+.top-left {
+  min-width: 120px;
+  padding-top: 2px;
 }
 
 .room-label {
@@ -185,9 +191,9 @@ button.small {
 }
 
 canvas {
-  width: min(calc(100vw - 220px), calc((100dvh - 122px) * 1.777));
+  width: min(calc(100vw - 220px), calc((100dvh - 126px) * 1.777));
   height: auto;
-  max-height: calc(100dvh - 122px);
+  max-height: calc(100dvh - 126px);
   background: #111827;
   border-radius: 18px;
   border: 1px solid var(--line);
@@ -203,6 +209,15 @@ canvas {
   border: 1px solid var(--line);
   border-radius: 14px;
   z-index: 5;
+}
+
+.top-hud {
+  width: 100%;
+  margin: 0;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 #statusText {
@@ -360,5 +375,51 @@ canvas {
     width: 94px;
     height: 94px;
     font-size: 14px;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .topbar {
+    grid-template-columns: 110px 1fr 78px;
+    gap: 8px;
+  }
+
+  .top-left {
+    min-width: 0;
+  }
+
+  .top-hud {
+    min-height: 52px;
+    padding: 7px 10px;
+  }
+
+  #statusText {
+    font-size: 15px;
+  }
+
+  #hintText {
+    font-size: 11px;
+  }
+}
+
+@media (max-height: 430px) {
+  .topbar {
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .top-hud {
+    min-height: 46px;
+    padding: 5px 8px;
+  }
+
+  #statusText {
+    font-size: 13px;
+  }
+
+  #hintText {
+    font-size: 10px;
+    margin-top: 1px;
   }
 }
