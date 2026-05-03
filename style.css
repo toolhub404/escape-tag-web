@@ -149,9 +149,9 @@ button.small {
   width: 100vw;
   height: 100dvh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto 1fr;
   justify-items: center;
-  align-items: center;
+  align-items: start;
   position: relative;
   padding:
     max(8px, env(safe-area-inset-top))
@@ -165,7 +165,7 @@ button.small {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   z-index: 5;
 }
 
@@ -185,9 +185,9 @@ button.small {
 }
 
 canvas {
-  width: min(calc(100vw - 220px), calc((100dvh - 92px) * 1.777));
+  width: min(calc(100vw - 220px), calc((100dvh - 122px) * 1.777));
   height: auto;
-  max-height: calc(100dvh - 92px);
+  max-height: calc(100dvh - 122px);
   background: #111827;
   border-radius: 18px;
   border: 1px solid var(--line);
@@ -197,9 +197,9 @@ canvas {
 
 .hud {
   width: min(100%, 920px);
-  margin-top: 4px;
+  margin: 0 0 6px;
   padding: 8px 12px;
-  background: rgba(15, 23, 42, 0.72);
+  background: rgba(15, 23, 42, 0.82);
   border: 1px solid var(--line);
   border-radius: 14px;
   z-index: 5;
@@ -330,11 +330,18 @@ canvas {
 @media (max-height: 430px) {
   .topbar {
     font-size: 13px;
+    margin-bottom: 4px;
   }
 
   .hud {
-    font-size: 13px;
-    padding: 6px 10px;
+    font-size: 12px;
+    padding: 5px 10px;
+    margin-bottom: 4px;
+  }
+
+  #hintText {
+    font-size: 11px;
+    margin-top: 2px;
   }
 
   .joystick {
