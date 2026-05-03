@@ -9,15 +9,14 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
-// ここをFirebase Consoleの設定に置き換える
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDEmqGFIKncZskk4LD92il-ekSvUANulos",
+  authDomain: "escape-tag-game.firebaseapp.com",
+  databaseURL: "https://escape-tag-game-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  projectId: "escape-tag-game",
+  storageBucket: "escape-tag-game.firebasestorage.app",
+  messagingSenderId: "945709179251",
+  appId: "1:945709179251:web:6c51da59359caae6592506"
 };
 
 const app = initializeApp(firebaseConfig);
