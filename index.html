@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Escape Tag</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="./style.css?v=5">
+  <link rel="stylesheet" href="./style.css?v=6">
 </head>
 <body>
   <div id="menu" class="screen">
@@ -36,21 +36,20 @@
 
   <div id="gameScreen" class="game-screen hidden">
     <div class="topbar">
-      <div>
+      <div class="top-left">
         <div id="roomLabel" class="room-label">ROOM</div>
         <div id="roleLabel" class="role-label">ROLE</div>
       </div>
-      <div class="top-actions">
-        <button id="leaveButton" class="small danger">退出</button>
+
+      <div class="top-status">
+        <div id="statusText">待機中...</div>
+        <div id="hintText">操作：左スティック / 右ACTION</div>
       </div>
+
+      <button id="leaveButton" class="small danger top-exit">退出</button>
     </div>
 
     <canvas id="game" width="720" height="405"></canvas>
-
-    <div class="hud">
-      <div id="statusText">待機中...</div>
-      <div id="hintText">操作：左スティック / 右ACTION</div>
-    </div>
 
     <div id="joystick" class="joystick">
       <div id="stick" class="stick"></div>
@@ -76,6 +75,6 @@
     </div>
   </div>
 
-  <script type="module" src="./game.js?v=5"></script>
+  <script type="module" src="./game.js?v=6"></script>
 </body>
 </html>
